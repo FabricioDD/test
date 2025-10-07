@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Encontre o Galo - Acervo Artístico</title>
+    <link rel="stylesheet" href="style.css">
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f5f5f5;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+        h1 { margin-bottom: 15px; }
+
+        .game {
+            display: flex;
+            gap: 20px;
+        }
+
+        .panel {
+            position: relative;
+            border: 2px solid #ccc;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        .panel img {
+            display: block;
+            max-width: 100%;
+            height: auto;
+        }
+
+        /* hotspots invisíveis */
+        .hotspot {
+            position: absolute;
+            border-radius: 50%;
+            cursor: pointer;
+            transform: translate(-50%, -50%);
+        }
+
+        /* quando acertado */
+        .hotspot.found::after {
+            content: "";
+            position: absolute;
+            left: 50%; top: 50%;
+            width: 40px; height: 40px;
+            transform: translate(-50%, -50%);
+            border: 3px solid rgb(199, 53, 53);
+            border-radius: 50%;
+            animation: pop 0.3s ease-out;
+        }
+
+        @keyframes pop {
+            0% { transform: translate(-50%, -50%) scale(0.3); opacity: 0; }
+            100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+        }
+
+        .status {
+            margin-top: 15px;
+            font-size: 18px;
+        }
+  </style>
+</head>
+<body>
+    <header>
+        <h1>Acervo Artístico</h1>
+    </header>
+
+    <main class="game-page-main">
+        
+        <div class="game-instructions">
+            <h2>Encontre o Galo</h2>
+            <p>Observe a obra de arte com atenção e clique no local onde você acha que o galo está escondido!</p>
+        </div>
+
+        <div class="game">
+            <!-- Imagem do galo -->
+            <div class="panel" id="panel">
+                <img src="imagens/galo.jpg" alt="Encontre o galo">
+                <!-- Hotspots dos erros -->
+                <!-- Basta ajustar left/top em % (coordenadas relativas à imagem) -->
+                <div class="hotspot" data-id="1" style="left: 43.33%; top: 26.02%; width: 40px; height: 40px;"></div>
+                <div class="hotspot" data-id="2" style="left: 72.54%; top: 32.48%; width: 110px; height: 110px;"></div>
+                <div class="hotspot" data-id="3" style="left: 12.61%; top: 34.43%; width: 40px; height: 40px;"></div>
+                <div class="hotspot" data-id="4" style="left: 31.38%; top: 82.48%; width: 40px; height: 40px;"></div>
+                <div class="hotspot" data-id="5" style="left: 37.75%; top: 63.32%; width: 30px; height: 30px;"></div>
+                <div class="hotspot" data-id="6" style="left: 23.91%; top: 50.31%; width: 40px; height: 40px;"></div>
+                <div class="hotspot" data-id="7" style="left: 60.65%; top: 41.60%; width: 40px; height: 40px;"></div>
+                <div class="hotspot" data-id="8" style="left: 76.16%; top: 40.88%; width: 40px; height: 40px;"></div>
+                <div class="hotspot" data-id="9" style="left: 62.75%; top: 66.50%; width: 40px; height: 40px;"></div>
+                <div class="hotspot" data-id="10" style="left: 76.59%; top: 75.41%; width: 40px; height: 40px;"></div>
+                <div class="hotspot" data-id="11" style="left: 77.61%; top: 66.09%; width: 40px; height: 40px;"></div>
+                <div class="hotspot" data-id="12" style="left: 92.17%; top: 36.99%; width: 40px; height: 40px;"></div>
+                <div class="hotspot" data-id="12" style="left: 49.57%; top: 61.27%; width: 40px; height: 40px;"></div>
+            </div>
+        </div>
+        
+        <div class="status">
+            Galos encontrados: <span id="found">0</span>/12
+        </div>
+
+        <script>
+            const hotspots = document.querySelectorAll('.hotspot');
+            let foundCount = 0;
+
+            hotspots.forEach(h => {
+            h.addEventListener('click', () => {
+                if (!h.classList.contains('found')) {
+                h.classList.add('found');
+                foundCount++;
+                document.getElementById('found').textContent = foundCount;
+                if (foundCount === hotspots.length) {
+                    setTimeout(() => alert("Parabéns! Você encontrou todos os erros!"), 200);
+                }
+                }
+            });
+            });
+        </script>
+
+        <a href="index.html" class="back-button">Voltar ao Início</a>
+
+    </main>
+
+    <footer>
+        <p>&copy; 2025 Acervo Artístico - Universidade Federal de Santa Maria (UFSM)</p>
+    </footer>
+
+    </body>
+</html>

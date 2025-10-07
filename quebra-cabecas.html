@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Quebra-Cabeça Drag & Drop</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+      background: #f5f5f5;
+    }
+    h1 { margin-bottom: 15px; }
+
+    .board {
+      display: grid;
+      gap: 1px;
+      border: 3px solid #333;
+      background: #333;
+    }
+
+    .slot {
+      background: #ddd;
+      position: relative;
+    }
+
+    .piece {
+      width: 100%;
+      height: 100%;
+      background-image: url("imagens/7erros.jpg");
+      background-size: calc(var(--cols) * 100px) calc(var(--rows) * 100px);
+      cursor: grab;
+    }
+
+    .piece.dragging {
+      opacity: 0.5;
+    }
+
+    #status { margin-top: 15px; font-weight: bold; }
+  </style>
+</head>
+<body>
+  <h1>Quebra-Cabeça</h1>
+  <div class="board" id="board"></div>
+  <p id="status"></p>
+
+  <script>
+    const rows = 4; // número de linhas
+    const cols = 6; // número de colunas (pode ser diferente!)
+    const tileSize = 100; // px
+    const board = document.getElementById("board");
+    const status = document.getElementById("status");
+    let slots = [];
+
+    board.style.gridTemplateColumns = `repeat(${cols}, ${tileSize}px)`;
+    board.style.gridTemplateRows = `repeat(${rows}, ${tileSize}px)`;
+    board.style.setProperty("--rows", rows);
+    board.style.setProperty("--cols", cols);
+
+    function createBoard() {
+      for (let row = 0; row < rows; row++) {
+        for (let col = 0; col < cols; col++) {
+          const slot = document.createElement("div");
+          slot.classList.add("slot");
+          slot.style.width = tileSize + "px";
+          slot.style.height = tileSize + "px";
+          slot.dataset.correct = row * cols + col;
+          board.appendChild(slot);
+          slots.push(slot);
+        }
+      }
+    }
+
+    function createPieces() {
+      let pieces = [];
+      for (let row = 0; row < rows; row++) {
+        for (let col = 0; col < cols; col++) {
+          const index = row * cols + col;
+          const piece = document.createElement("div");
+          piece.classList.add("piece");
+          piece.style.backgroundPosition = `-${col * tileSize}px -${row * tileSize}px`;
+          piece.draggable = true;
+          piece.dataset.index = index;
+          pieces.push(piece);
+        }
+      }
+      return pieces;
+    }
+
+    function shuffle(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+    }
+
+    function init() {
+      createBoard();
+      const pieces = createPieces();
+      shuffle(pieces);
+
+      // Distribui peças nos slots
+      slots.forEach((slot, i) => {
+        slot.appendChild(pieces[i]);
+      });
+
+      // eventos drag & drop
+      let dragged = null;
+
+      board.addEventListener("dragstart", e => {
+        if (e.target.classList.contains("piece")) {
+          dragged = e.target;
+          e.target.classList.add("dragging");
+        }
+      });
+
+      board.addEventListener("dragend", e => {
+        if (dragged) {
+          dragged.classList.remove("dragging");
+          dragged = null;
+        }
+      });
+
+      board.addEventListener("dragover", e => {
+        e.preventDefault();
+      });
+
+      board.addEventListener("drop", e => {
+        e.preventDefault();
+        const targetSlot = e.target.classList.contains("slot")
+          ? e.target
+          : e.target.parentElement;
+
+        if (targetSlot.classList.contains("slot")) {
+          if (!targetSlot.firstChild) {
+            // se slot vazio → só encaixa
+            targetSlot.appendChild(dragged);
+          } else if (targetSlot.firstChild !== dragged) {
+            // se já tem peça → troca
+            const otherPiece = targetSlot.firstChild;
+            const fromSlot = dragged.parentElement;
+            targetSlot.appendChild(dragged);
+            fromSlot.appendChild(otherPiece);
+          }
+          checkWin();
+        }
+      });
+    }
+
+    function checkWin() {
+      const correct = slots.every(slot => {
+        if (!slot.firstChild) return false;
+        return slot.dataset.correct === slot.firstChild.dataset.index;
+      });
+      if (correct) {
+        status.textContent = "🎉 Parabéns! Você completou o quebra-cabeça!";
+      }
+    }
+
+    init();
+  </script>
+</body>
+</html>
